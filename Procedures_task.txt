@@ -1,0 +1,242 @@
+
+
+//////// creating database person
+
+
+
+
+MariaDB [(none)]> create database person;
+Query OK, 1 row affected (0.009 sec)
+
+MariaDB [(none)]> use person;
+Database changed
+
+
+///////// creating tables
+
+
+
+MariaDB [person]> create table users(
+    -> user_id         INT               NOT NULL,
+    -> user_name       VARCHAR(16)       NOT NULL,
+    -> password        VARCHAR(16)       NOT NULL,
+    -> email           VARCHAR(16)       NOT NULL,
+    -> primary key (user_id)
+    -> );
+Query OK, 0 rows affected (0.118 sec)
+
+MariaDB [person]> 
+MariaDB [person]> 
+MariaDB [person]> create table summary(
+    -> id               INT              NOT NULL,
+    -> total_users      INT              NOT NULL,
+    -> Yahoo            INT              NOT NULL,
+    -> Hotmail          INT              NOT NULL,
+    -> Gmail            INT              NOT NULL,
+    -> primary key (id)
+    -> );
+Query OK, 0 rows affected (0.041 sec)
+
+
+//////changing delimiter
+
+
+
+MariaDB [person]>  DELIMITER $$ ;
+
+
+
+
+//////// Write a procedure that take id, total_user, Yahoo, Hotmail, Gmail values as an
+input and insert the data into the table summary. 
+
+
+
+
+
+
+
+MariaDB [person]>  Create PROCEDURE insert_summary(IN p_id INT, IN t_users INT,IN Yahooo INT, IN hotmaill INT , IN gmaill INT)
+    ->     BEGIN
+    ->     insert into summary(id, total_users, Yahoo, Hotmail,Gmail) values (p_id, t_users,Yahooo, hotmaill,gmaill);
+    ->      END $$
+Query OK, 0 rows affected (0.009 sec)
+
+MariaDB [person]> call insert_summary(1,2,1,0,1) $$
+Query OK, 1 row affected (0.038 sec)
+
+MariaDB [person]> call insert_summary(2,3,1,1,1) $$
+Query OK, 1 row affected (0.004 sec)
+
+MariaDB [person]> call insert_summary(3,1,0,0,1) $$
+Query OK, 1 row affected (0.004 sec)
+
+MariaDB [person]> call insert_summary(4,2,0,1,1) $$
+Query OK, 1 row affected (0.003 sec)
+
+MariaDB [person]> 
+MariaDB [person]> select* from summary $$
++----+-------------+-------+---------+-------+
+| id | total_users | Yahoo | Hotmail | Gmail |
++----+-------------+-------+---------+-------+
+|  1 |           2 |     1 |       0 |     1 |
+|  2 |           3 |     1 |       1 |     1 |
+|  3 |           1 |     0 |       0 |     1 |
+|  4 |           2 |     0 |       1 |     1 |
++----+-------------+-------+---------+-------+
+4 rows in set (0.000 sec)
+
+
+
+
+
+
+
+/////// Write a procedure that take user_id, username, password, email values as an
+input and insert the data into the table Users.
+
+
+
+
+
+
+MariaDB [person]>  Create PROCEDURE insert_users(IN usser_id INT, IN userr_name VARCHAR(16),IN passwoord VARCHAR(16), IN emaill VARCHAR(16))
+    ->     BEGIN
+    ->     insert into users(user_id, user_name, password, email) values (usser_id, userr_name,passwoord, emaill );
+    ->      END $$
+Query OK, 0 rows affected (0.013 sec)
+
+MariaDB [person]> 
+MariaDB [person]> call insert_users(1,'abc123','def321','abc123@yahoo.com') $$
+Query OK, 1 row affected (0.007 sec)
+
+MariaDB [person]> call insert_users(2 ,'xyz789' ,'vbn123', 'xyz789@gmail.com') $$
+Query OK, 1 row affected (0.004 sec)
+
+MariaDB [person]> call insert_users(3 ,'wxy789' ,'erb123', 'wxy789@gmail.com') $$
+Query OK, 1 row affected (0.003 sec)
+
+MariaDB [person]> call insert_users(4 ,'mno789' ,'jkl123', 'mno789@gmail.com') $$
+Query OK, 1 row affected (0.003 sec)
+
+MariaDB [person]> 
+MariaDB [person]> select* from users $$
++---------+-----------+----------+------------------+
+| user_id | user_name | password | email            |
++---------+-----------+----------+------------------+
+|       1 | abc123    | def321   | abc123@yahoo.com |
+|       2 | xyz789    | vbn123   | xyz789@gmail.com |
+|       3 | wxy789    | erb123   | wxy789@gmail.com |
+|       4 | mno789    | jkl123   | mno789@gmail.com |
++---------+-----------+----------+------------------+
+4 rows in set (0.000 sec)
+
+
+
+///////Write a procedure that output the average value of yahoo
+
+
+
+
+
+
+
+MariaDB [person]> CREATE PROCEDURE avg_yahoo(out avg_value decimal(8,2)) BEGIN SELECT AVG(yahoo) INTO avg_value FROM summary; 
+    -> END$$ 
+Query OK, 0 rows affected (0.009 sec)
+
+MariaDB [person]> call avg_yahoo(@out) $$
+Query OK, 1 row affected (0.001 sec)
+
+MariaDB [person]> select @out $$
++------+
+| @out |
++------+
+| 0.50 |
++------+
+1 row in set (0.000 sec)
+
+
+
+
+
+//////Write a procedure that output the min value of Gmail.
+
+
+
+
+
+MariaDB [person]> CREATE PROCEDURE min_gmail(out min_value INT) BEGIN SELECT MIN(Gmail) INTO min_value FROM summary; 
+    -> END$$ 
+Query OK, 0 rows affected (0.009 sec)
+
+MariaDB [person]> call  min_gmail(@out) $$
+Query OK, 1 row affected (0.001 sec)
+
+MariaDB [person]> select @out $$
++------+
+| @out |
++------+
+|    1 |
++------+
+1 row in set (0.000 sec)
+
+
+
+
+
+/////Write a procedure that output the max value of Hotmail.
+
+
+
+
+
+MariaDB [person]> CREATE PROCEDURE max_hotmail(out max_value INT) BEGIN SELECT Max(Hotmail) INTO max_value FROM summary; 
+    -> END$$ 
+Query OK, 0 rows affected (0.016 sec)
+
+MariaDB [person]> call  max_hotmail(@out) $$
+Query OK, 1 row affected (0.000 sec)
+
+MariaDB [person]> select @out $$
++------+
+| @out |
++------+
+|    1 |
++------+
+1 row in set (0.000 sec)
+
+
+
+
+
+/////Write a procedure that update the total user by 1 when yahoo value is less than
+equal to Hotmail.
+
+
+
+
+
+
+MariaDB [person]> CREATE PROCEDURE proc_update() 
+    -> BEGIN 
+    -> UPDATE summary
+    -> SET total_users = 1
+    -> WHERE Yahoo <= Hotmail; 
+    -> END $$
+Query OK, 0 rows affected (0.009 sec)
+
+MariaDB [person]> call proc_update() $$
+Query OK, 2 rows affected (0.004 sec)
+
+MariaDB [person]> select* from summary $$
++----+-------------+-------+---------+-------+
+| id | total_users | Yahoo | Hotmail | Gmail |
++----+-------------+-------+---------+-------+
+|  1 |           2 |     1 |       0 |     1 |
+|  2 |           1 |     1 |       1 |     1 |
+|  3 |           1 |     0 |       0 |     1 |
+|  4 |           1 |     0 |       1 |     1 |
++----+-------------+-------+---------+-------+
+4 rows in set (0.000 sec)
+

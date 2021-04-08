@@ -1,0 +1,106 @@
+
+
+
+    Q1
+
+
+
+MariaDB [themepark]> select emp_fname,emp_lname from employee,hours where hours.emp_num = employee.emp_num and hour_rate > (select AVG(hour_rate) from hours);
++-----------+-----------+
+| emp_fname | emp_lname |
++-----------+-----------+
+| Enrica    | Denver    |
+| Enrica    | Denver    |
+| Mirrelle  | Namowa    |
+| Mirrelle  | Namowa    |
+| Mirrelle  | Namowa    |
++-----------+-----------+
+5 rows in set (0.001 sec)
+
+
+
+
+
+              Q2
+
+
+
+
+
+MariaDB [themepark]> 
+MariaDB [themepark]> select park_code from attraction where attract_capacity > (select AVG(attract_capacity) from attraction);
++-----------+
+| park_code |
++-----------+
+| FR1001    |
+| UK3452    |
+| UK3452    |
+| ZA1342    |
++-----------+
+4 rows in set (0.000 sec)
+
+
+
+
+
+
+        Q3
+
+
+
+MariaDB [themepark]> select emp_fname,emp_lname,date_worked,(select AVG(hour_rate) from hours) as AVERAGE,hour_rate -(select AVG(hour_rate) from hours) AS DIFFERENCE from employee,hours where employee.emp_num = hours.emp_num;
++-----------+------------+-------------+----------+------------+
+| emp_fname | emp_lname  | date_worked | AVERAGE  | DIFFERENCE |
++-----------+------------+-------------+----------+------------+
+| Emma      | Calderdale | 2007-05-18  | 7.033636 |  -0.533636 |
+| Emma      | Calderdale | 2007-05-20  | 7.033636 |  -0.533636 |
+| Marshel   | Ricardo    | 2007-05-18  | 7.033636 |  -0.533636 |
+| Arif      | Arshad     | 2007-05-23  | 7.033636 |  -1.043636 |
+| Arif      | Arshad     | 2007-05-21  | 7.033636 |  -1.043636 |
+| Arif      | Arshad     | 2007-05-22  | 7.033636 |  -1.043636 |
+| Enrica    | Denver     | 2007-05-21  | 7.033636 |   0.166364 |
+| Enrica    | Denver     | 2007-05-22  | 7.033636 |   0.166364 |
+| Mirrelle  | Namowa     | 2007-05-18  | 7.033636 |   1.466364 |
+| Mirrelle  | Namowa     | 2007-05-18  | 7.033636 |   1.466364 |
+| Mirrelle  | Namowa     | 2007-05-19  | 7.033636 |   1.466364 |
++-----------+------------+-------------+----------+------------+
+11 rows in set (0.002 sec)
+
+
+
+
+      Q4
+
+
+
+
+
+
+MariaDB [themepark]> select park_name from themepark where park_code IN (select park_code from ticket where ticket_no IN (select ticket_no from sales_line));
++--------------+
+| park_name    |
++--------------+
+| FairyLand    |
+| PleasureLand |
+| GoldTown     |
++--------------+
+3 rows in set (0.001 sec)
+
+
+
+         Q5
+
+
+MariaDB [themepark]> 
+MariaDB [themepark]> select park_name from themepark where park_code NOT IN (select park_code from ticket where ticket_no IN (select ticket_no from sales_line));
++---------------+
+| park_name     |
++---------------+
+| Efling        |
+| AdventurePort |
+| Labyrinthe    |
+| MiniLand      |
++---------------+
+4 rows in set (0.001 sec)
+
+MariaDB [themepark]> 

@@ -1,0 +1,117 @@
+MariaDB [person]> select* from users;
++---------+-----------+----------+------------------+
+| user_id | user_name | password | email            |
++---------+-----------+----------+------------------+
+|       1 | abc123    | def321   | abc123@yahoo.com |
+|       2 | xyz789    | vbn123   | xyz789@gmail.com |
+|       3 | wxy789    | erb123   | wxy789@gmail.com |
+|       4 | mno789    | jkl123   | mno789@gmail.com |
+|       5 | ghj345    | er321    | fast123@yahoo.co |
+|       6 | kjh123    | bdf123   | ayesha@gmail.com |
+|       7 | asd739    | mhg123   | aziz@gmail.com   |
+|       8 | poi889    | plk123   | sadaf@Hotmail.co |
+|       9 | vgf985    | sdf321   | abc123@yahoo.com |
+|      10 | mht456    | mnd123   | xyz789@gmail.com |
+|      11 | dfr678    | fgh123   | wxy789@gmail.com |
+|      12 | qwe456    | vgf123   | mno789@gmail.com |
++---------+-----------+----------+------------------+
+12 rows in set (0.000 sec)
+
+
+
+     Q:1 Create a single-column index using attribute email
+
+
+
+MariaDB [person]>  create index indx_email on users (email);
+Query OK, 0 rows affected (0.028 sec)
+Records: 0  Duplicates: 0  Warnings: 0
+
+
+
+   Q:2 Create a composite-column index using attributes username and password 
+
+
+
+MariaDB [person]> create index indx_comp on users(user_name,password);
+Query OK, 0 rows affected (0.029 sec)
+Records: 0  Duplicates: 0  Warnings: 0
+
+
+
+   Q:3  Display the list of indexes for table users 
+
+
+
+MariaDB [person]> show index from users\G; 
+*************************** 1. row ***************************
+        Table: users
+   Non_unique: 0
+     Key_name: PRIMARY
+ Seq_in_index: 1
+  Column_name: user_id
+    Collation: A
+  Cardinality: 12
+     Sub_part: NULL
+       Packed: NULL
+         Null: 
+   Index_type: BTREE
+      Comment: 
+Index_comment: 
+*************************** 2. row ***************************
+        Table: users
+   Non_unique: 1
+     Key_name: indx_email
+ Seq_in_index: 1
+  Column_name: email
+    Collation: A
+  Cardinality: 12
+     Sub_part: NULL
+       Packed: NULL
+         Null: 
+   Index_type: BTREE
+      Comment: 
+Index_comment: 
+*************************** 3. row ***************************
+        Table: users
+   Non_unique: 1
+     Key_name: indx_comp
+ Seq_in_index: 1
+  Column_name: user_name
+    Collation: A
+  Cardinality: 12
+     Sub_part: NULL
+       Packed: NULL
+         Null: 
+   Index_type: BTREE
+      Comment: 
+Index_comment: 
+*************************** 4. row ***************************
+        Table: users
+   Non_unique: 1
+     Key_name: indx_comp
+ Seq_in_index: 2
+  Column_name: password
+    Collation: A
+  Cardinality: 12
+     Sub_part: NULL
+       Packed: NULL
+         Null: 
+   Index_type: BTREE
+      Comment: 
+Index_comment: 
+4 rows in set (0.002 sec)
+
+ERROR: No query specified
+
+
+
+
+  Q:4   What is implicit index and unique index?
+
+ Ans:   Unique indexes are used for data integrity and performance.it does not allow duplicate values in a table.
+       Implicit indexes are automatically created by the database server when an object is created. Indexes are automatically created for primary key constraints and unique constraints. 
+
+
+
+

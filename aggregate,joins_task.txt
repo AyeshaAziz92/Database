@@ -1,0 +1,296 @@
+MariaDB [themepark]> 
+
+
+//////1... Display the park names and total sales for Theme Parks who are located in thecountry ‘UK’ or ‘FR’
+
+
+
+
+
+
+MariaDB [themepark]> select park_name,park_country,sum(Distinct line_price) from 
+    -> themepark,sales_line,sales where 
+    -> themepark.park_country='uk' or themepark.park_country='fr' and themepark.park_code = sales.park_code
+    -> and sales_line.transaction_no=sales.transaction_no group by park_name;
++--------------+--------------+--------------------------+
+| park_name    | park_country | sum(Distinct line_price) |
++--------------+--------------+--------------------------+
+| FairyLand    | FR           |                   301.90 |
+| MiniLand     | UK           |                   838.80 |
+| PleasureLand | UK           |                   838.80 |
++--------------+--------------+--------------------------+
+3 rows in set (0.003 sec)
+
+
+
+ 
+
+
+                                                            OR
+
+
+
+MariaDB [themepark]> select  park_name,transaction_no,sale_date from themepark, sales where (themepark.park_country = 'uk' OR themepark.park_country = 'fr') And (themepark.park_code = sales.park_code);
++--------------+----------------+------------+
+| park_name    | transaction_no | sale_date  |
++--------------+----------------+------------+
+| FairyLand    |          12781 | 2007-05-18 |
+| FairyLand    |          12782 | 2007-05-18 |
+| FairyLand    |          12783 | 2007-05-18 |
+| FairyLand    |          12784 | 2007-05-18 |
+| FairyLand    |          12785 | 2007-05-18 |
+| FairyLand    |          12786 | 2007-05-18 |
+| PleasureLand |          34534 | 2007-05-18 |
+| PleasureLand |          34535 | 2007-05-18 |
+| PleasureLand |          34536 | 2007-05-18 |
+| PleasureLand |          34537 | 2007-05-18 |
+| PleasureLand |          34538 | 2007-05-18 |
+| PleasureLand |          34539 | 2007-05-18 |
+| PleasureLand |          34540 | 2007-05-18 |
+| PleasureLand |          34541 | 2007-05-18 |
++--------------+----------------+------------+
+14 rows in set (0.001 sec)
+
+
+
+
+
+
+
+
+
+/////2...Display the park code of only those attraction who’s attraction capacity is less than average 
+
+
+
+
+
+
+
+
+
+
+MariaDB [themepark]> select park_code from attraction where attract_capacity < (select AVG(attract_capacity) from attraction);
++-----------+
+| park_code |
++-----------+
+| FR1001    |
+| FR1001    |
+| FR1001    |
+| FR1001    |
+| ZA1342    |
+| UK3452    |
+| UK3452    |
++-----------+
+7 rows in set (0.001 sec)
+
+
+
+
+
+
+
+/////3.Display no of times each park code appeared in ticket table
+
+
+
+
+
+
+
+MariaDB [themepark]> select park_code,count(park_code) from ticket group by park_code;
++-----------+------------------+
+| park_code | count(park_code) |
++-----------+------------------+
+| FR1001    |                3 |
+| SP4533    |                3 |
+| UK3452    |                3 |
+| ZA1342    |                3 |
++-----------+------------------+
+4 rows in set (0.001 sec)
+
+
+
+
+
+
+////4.Display all the data of from the ticket table sorted in descending order with respect to ticket price
+
+
+
+
+
+
+
+MariaDB [themepark]> select * from ticket order by ticket_type desc;
++-----------+--------------+-------------+-----------+
+| TICKET_NO | TICKET_PRICE | TICKET_TYPE | PARK_CODE |
++-----------+--------------+-------------+-----------+
+|     89720 |        10.99 | Senior      | UK3452    |
+|     11003 |        10.99 | Senior      | SP4533    |
+|     67855 |        12.12 | Senior      | ZA1342    |
+|     13003 |        20.99 | Senior      | FR1001    |
+|     88567 |        22.50 | Child       | UK3452    |
+|     67832 |        18.56 | Child       | ZA1342    |
+|     13001 |        18.99 | Child       | FR1001    |
+|     11002 |        14.99 | Child       | SP4533    |
+|     13002 |        34.99 | Adult       | FR1001    |
+|     67833 |        28.67 | Adult       | ZA1342    |
+|     88568 |        42.10 | Adult       | UK3452    |
+|     11001 |        24.99 | Adult       | SP4533    |
++-----------+--------------+-------------+-----------+
+12 rows in set (0.001 sec)
+
+
+
+
+
+
+////5.Display all the data from attraction table sorted in ascending with respect to Attraction name and attract age
+
+
+
+
+
+
+
+MariaDB [themepark]> select * from attraction order by attract_name, attract_age asc;
++------------+-----------------+-------------+------------------+-----------+
+| ATTRACT_NO | ATTRACT_NAME    | ATTRACT_AGE | ATTRACT_CAPACITY | PARK_CODE |
++------------+-----------------+-------------+------------------+-----------+
+|      10082 | NULL            |          10 |               40 | ZA1342    |
+|      20056 | 3D-Lego_Show    |           3 |              200 | UK3452    |
+|      10078 | Ant-Trap        |          23 |               30 | FR1001    |
+|      30011 | BlackHole2      |          12 |               34 | UK3452    |
+|      10098 | Carnival        |           3 |              120 | FR1001    |
+|      10067 | FlightToStars   |          11 |               24 | FR1001    |
+|      98764 | GoldRush        |           5 |               80 | ZA1342    |
+|      30012 | Pirates         |          10 |               42 | UK3452    |
+|      10056 | SpinningTeacups |           4 |               62 | FR1001    |
+|      10034 | ThunderCoaster  |          11 |               34 | FR1001    |
+|      30044 | UnderSeaWord    |           4 |               80 | UK3452    |
++------------+-----------------+-------------+------------------+-----------+
+11 rows in set (0.001 sec)
+
+
+
+
+
+
+////6.Count the no of times child,Adult andSeniorappeared in table ticke
+
+
+
+
+
+
+
+MariaDB [themepark]> select ticket_type,(count(ticket_type)) from ticket group by ticket_type;
++-------------+----------------------+
+| ticket_type | (count(ticket_type)) |
++-------------+----------------------+
+| Adult       |                    4 |
+| Child       |                    4 |
+| Senior      |                    4 |
++-------------+----------------------+
+3 rows in set (0.001 sec)
+
+
+
+
+
+///7.Display only these columnspark name, parkcity,attract name and attract age
+
+
+
+
+
+
+
+MariaDB [themepark]> select park_name,park_city, attract_name,attract_age from themepark,attraction where themepark.park_code = attraction.park_code;
++--------------+--------------+-----------------+-------------+
+| park_name    | park_city    | attract_name    | attract_age |
++--------------+--------------+-----------------+-------------+
+| FairyLand    | PARIS        | ThunderCoaster  |          11 |
+| FairyLand    | PARIS        | SpinningTeacups |           4 |
+| FairyLand    | PARIS        | FlightToStars   |          11 |
+| FairyLand    | PARIS        | Ant-Trap        |          23 |
+| GoldTown     | JOHANNESBURG | NULL            |          10 |
+| FairyLand    | PARIS        | Carnival        |           3 |
+| PleasureLand | STOKE        | 3D-Lego_Show    |           3 |
+| PleasureLand | STOKE        | BlackHole2      |          12 |
+| PleasureLand | STOKE        | Pirates         |          10 |
+| PleasureLand | STOKE        | UnderSeaWord    |           4 |
+| GoldTown     | JOHANNESBURG | GoldRush        |           5 |
++--------------+--------------+-----------------+-------------+
+11 rows in set (0.000 sec)
+
+
+
+
+
+////8.Displaythe name and age of all those attractions whosecapacity is greater than40 sorted in descendingorder with respect to age.
+
+
+
+
+
+
+MariaDB [themepark]> select attract_name, attract_age from attraction  where attract_capacity>40 order by attract_age desc;
++-----------------+-------------+
+| attract_name    | attract_age |
++-----------------+-------------+
+| Pirates         |          10 |
+| GoldRush        |           5 |
+| SpinningTeacups |           4 |
+| UnderSeaWord    |           4 |
+| Carnival        |           3 |
+| 3D-Lego_Show    |           3 |
++-----------------+-------------+
+6 rows in set (0.001 sec)
+
+
+
+
+
+/////9.Write a query that displays the average hourly rate that has been paid to allemployees. Hint use the HOURS table. Your query should return 7.03
+
+
+
+
+MariaDB [themepark]> 
+MariaDB [themepark]> select AVG(hour_rate) from hours;
++----------------+
+| AVG(hour_rate) |
++----------------+
+|       7.033636 |
++----------------+
+1 row in set (0.000 sec)
+
+
+
+
+//////10.Write a query to display the attraction number, employee first and last names andthe date they worked on the attraction. Order the results by the date worked
+
+
+
+
+
+MariaDB [themepark]> select t.attract_no,emp_fname,emp_lname,date_worked from attraction t,employee e ,hours h  where (e.emp_num = h.emp_num) AND (t.attract_no= h.attract_no) order by date_worked;
++------------+-----------+------------+-------------+
+| attract_no | emp_fname | emp_lname  | date_worked |
++------------+-----------+------------+-------------+
+|      10078 | Mirrelle  | Namowa     | 2007-05-18  |
+|      10098 | Mirrelle  | Namowa     | 2007-05-18  |
+|      10034 | Emma      | Calderdale | 2007-05-18  |
+|      10034 | Marshel   | Ricardo    | 2007-05-18  |
+|      10098 | Mirrelle  | Namowa     | 2007-05-19  |
+|      10034 | Emma      | Calderdale | 2007-05-20  |
+|      30044 | Arif      | Arshad     | 2007-05-21  |
+|      30011 | Enrica    | Denver     | 2007-05-21  |
+|      30044 | Arif      | Arshad     | 2007-05-22  |
+|      30012 | Enrica    | Denver     | 2007-05-22  |
+|      30012 | Arif      | Arshad     | 2007-05-23  |
++------------+-----------+------------+-------------+
+11 rows in set (0.001 sec)
+

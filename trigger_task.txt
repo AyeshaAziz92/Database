@@ -1,0 +1,334 @@
+
+/////// creating tables
+
+
+MariaDB [person]> create table users(
+    -> user_id         INT               NOT NULL,
+    -> user_name       VARCHAR(16)       NOT NULL,
+    -> password        VARCHAR(16)       NOT NULL,
+    -> email           VARCHAR(16)       NOT NULL,
+    -> primary key (user_id)
+    -> );
+Query OK, 0 rows affected (0.039 sec)
+
+
+MariaDB [person]> 
+MariaDB [person]> 
+MariaDB [person]> create table summary(
+    -> id               INT              NOT NULL,
+    -> total_users      INT              NOT NULL,
+    -> Yahoo            INT              NOT NULL,
+    -> Hotmail          INT              NOT NULL,
+    -> Gmail            INT              NOT NULL,
+    -> primary key (id)
+    -> );
+Query OK, 0 rows affected (0.038 sec)
+
+
+
+MariaDB [person]> 
+MariaDB [person]> 
+MariaDB [person]>  DELIMITER $$ 
+
+
+
+     Q:1  Create a stored procedure to insert data into the users table. The values to be stored must be passed as parameters to the stored procedure
+
+
+
+
+MariaDB [person]> 
+MariaDB [person]>  Create PROCEDURE insert_users(IN usser_id INT, IN userr_name VARCHAR(16),IN passwoord VARCHAR(16), IN emaill VARCHAR(16))
+    ->     BEGIN
+    ->     insert into users(user_id, user_name, password, email) values (usser_id, userr_name,passwoord, emaill );
+    ->      END $$
+Query OK, 0 rows affected (0.008 sec)
+
+
+
+
+
+
+   Q:2   Create trigger(s) to update the records in the summary table. The summary table will contain only one record and will be updated each time a new entry is made to the users table,         or an email address is updated in the users table or a user is deleted from the users table. 
+
+
+
+           1)    For INSERT 
+
+
+
+MariaDB [person]>  create trigger `insert_trigger` after insert ON `users`
+    ->      for each row
+    ->      IF NEW.user_id THEN
+    ->      UPDATE summary set total_users=total_users+1;
+    ->      UPDATE summary set yahoo=yahoo+1 where NEW.email like '%yahoo.com';
+    ->      UPDATE summary set gmail=gmail+1 where NEW.email like '%gmail.com';
+    ->      UPDATE summary set hotmail=hotmail+1 where NEW.email like '%hotmail.com';
+    ->      END IF;
+    ->      END $$
+Query OK, 0 rows affected (0.018 sec)
+
+
+
+        2) for UPDATE 
+
+
+
+MariaDB [person]> 
+MariaDB [person]> 
+MariaDB [person]> create trigger `update_trigger` after update ON `users`
+    ->           for each row
+    ->           IF old.user_id THEN
+    ->           UPDATE summary set yahoo=yahoo+1 where NEW.email like '%yahoo.com';
+    ->           UPDATE summary set gmail=gmail+1 where NEW.email like '%gmail.com';
+    ->          UPDATE summary set hotmail=hotmail+1 where NEW.email like '%hotmail.com';
+    ->          UPDATE summary set yahoo=yahoo-1 where old.email like '%yahoo.com';
+    ->          UPDATE summary set gmail=gmail-1 where old.email like '%gmail.com';
+    ->          UPDATE summary set hotmail=hotmail-1 where old.email like '%hotmail.com';
+    ->          END IF;
+    ->          END $$
+Query OK, 0 rows affected (0.026 sec)
+
+
+
+
+
+      3) for DELETE 
+
+
+
+MariaDB [person]> 
+MariaDB [person]> 
+MariaDB [person]> create trigger `delete_trigger` after delete ON `users`
+    ->            for each row
+    ->            IF old.user_id THEN
+    ->            UPDATE summary set total_users=total_users-1;
+    ->            UPDATE summary set yahoo=yahoo-1 where old.email like '%yahoo.com';
+    ->            UPDATE summary set gmail=gmail-1 where old.email like '%gmail.com';
+    ->            UPDATE summary set hotmail=hotmail-1 where old.email like '%hotmail.com';
+    ->            END IF;
+    ->             END $$
+Query OK, 0 rows affected (0.022 sec)
+
+
+
+
+    ///// inserting data into user by using procedure 
+
+
+
+MariaDB [person]> call insert_users(1,'abc123','def321','abc123@yahoo.com') $$
+Query OK, 3 rows affected (0.007 sec)
+
+MariaDB [person]> call insert_users(2 ,'xyz789' ,'vbn123', 'xyz789@gmail.com') $$
+Query OK, 3 rows affected (0.006 sec)
+
+MariaDB [person]> call insert_users(3 ,'wxy789' ,'erb123', 'wxy789@gmail.com') $$
+Query OK, 3 rows affected (0.005 sec)
+
+MariaDB [person]> call insert_users(4 ,'mno789' ,'jkl123', 'mno789@gmail.com') $$
+Query OK, 3 rows affected (0.003 sec)
+
+MariaDB [person]> 
+MariaDB [person]> call insert_users(5,'1234','e321','w123@yahoo.com') $$
+Query OK, 3 rows affected (0.003 sec)
+
+MariaDB [person]> call insert_users(6 ,'kjh123' ,'bdf123', 'ayesha@gmail.com') $$
+Query OK, 3 rows affected (0.003 sec)
+
+MariaDB [person]> call insert_users(7 ,'asd739' ,'mhg123', 'aziz@gmail.com') $$
+Query OK, 3 rows affected (0.003 sec)
+
+MariaDB [person]> call insert_users(8 ,'p889' ,'pl123', 'e345@Hotmail.com') $$
+Query OK, 3 rows affected (0.003 sec)
+
+MariaDB [person]> 
+MariaDB [person]> call insert_users(9,'v985','s321','a123@Hotmail.com') $$
+Query OK, 3 rows affected (0.003 sec)
+
+MariaDB [person]> call insert_users(10 ,'mht456' ,'mnd123', 'xyz789@yahoo.com') $$
+Query OK, 3 rows affected (0.002 sec)
+
+MariaDB [person]> call insert_users(11 ,'dfr678' ,'fgh123', 'wxy789@gmail.com') $$
+Query OK, 3 rows affected (0.002 sec)
+
+MariaDB [person]> call insert_users(12 ,'q456' ,'v123', 'm89@Hotmail.com') $$
+Query OK, 3 rows affected (0.003 sec)
+
+
+
+  //////// First displaying the users table 
+ 
+
+
+MariaDB [person]> select* from users $$
++---------+-----------+----------+------------------+
+| user_id | user_name | password | email            |
++---------+-----------+----------+------------------+
+|       1 | abc123    | def321   | abc123@yahoo.com |
+|       2 | xyz789    | vbn123   | xyz789@gmail.com |
+|       3 | wxy789    | erb123   | wxy789@gmail.com |
+|       4 | mno789    | jkl123   | mno789@gmail.com |
+|       5 | 1234      | e321     | w123@yahoo.com   |
+|       6 | kjh123    | bdf123   | ayesha@gmail.com |
+|       7 | asd739    | mhg123   | aziz@gmail.com   |
+|       8 | p889      | pl123    | e345@Hotmail.com |
+|       9 | v985      | s321     | a123@Hotmail.com |
+|      10 | mht456    | mnd123   | xyz789@yahoo.com |
+|      11 | dfr678    | fgh123   | wxy789@gmail.com |
+|      12 | q456      | v123     | m89@Hotmail.com  |
++---------+-----------+----------+------------------+
+12 rows in set (0.000 sec)
+
+
+
+/////// checking for summary update. Sucessfully updated all record that you can see below clearly.
+
+
+
+
+
+MariaDB [person]> select* from summary $$
++----+-------------+-------+---------+-------+
+| id | total_users | Yahoo | Hotmail | Gmail |
++----+-------------+-------+---------+-------+
+|  1 |          12 |     3 |       3 |     6 |
++----+-------------+-------+---------+-------+
+1 row in set (0.000 sec)
+
+
+///// Now checking whether Insert trigger acutually works or not. 
+
+
+
+
+
+MariaDB [person]> insert into users (user_id,user_name,password,email) values(13 ,'q456' ,'vg123', 'no789@gmail.com') $$
+Query OK, 1 row affected (0.003 sec)
+
+MariaDB [person]> select* from users $$
++---------+-----------+----------+------------------+
+| user_id | user_name | password | email            |
++---------+-----------+----------+------------------+
+|       1 | abc123    | def321   | abc123@yahoo.com |
+|       2 | xyz789    | vbn123   | xyz789@gmail.com |
+|       3 | wxy789    | erb123   | wxy789@gmail.com |
+|       4 | mno789    | jkl123   | mno789@gmail.com |
+|       5 | 1234      | e321     | w123@yahoo.com   |
+|       6 | kjh123    | bdf123   | ayesha@gmail.com |
+|       7 | asd739    | mhg123   | aziz@gmail.com   |
+|       8 | p889      | pl123    | e345@Hotmail.com |
+|       9 | v985      | s321     | a123@Hotmail.com |
+|      10 | mht456    | mnd123   | xyz789@yahoo.com |
+|      11 | dfr678    | fgh123   | wxy789@gmail.com |
+|      12 | q456      | v123     | m89@Hotmail.com  |
+|      13 | q456      | vg123    | no789@gmail.com  |
++---------+-----------+----------+------------------+
+13 rows in set (0.000 sec)
+
+
+
+/////// The entry have been sucessfully updated in summary table too.
+
+
+
+MariaDB [person]> select* from summary $$
++----+-------------+-------+---------+-------+
+| id | total_users | Yahoo | Hotmail | Gmail |
++----+-------------+-------+---------+-------+
+|  1 |          13 |     3 |       3 |     7 |
++----+-------------+-------+---------+-------+
+1 row in set (0.000 sec)
+
+
+/////// Checking for update trigger.First updating a data entry.
+
+
+
+
+MariaDB [person]> UPDATE users SET email = 'a123@gmail.com' WHERE user_id = 1;
+    -> $$
+Query OK, 1 row affected (0.004 sec)
+Rows matched: 1  Changed: 1  Warnings: 0
+
+MariaDB [person]> select* from users $$
++---------+-----------+----------+------------------+
+| user_id | user_name | password | email            |
++---------+-----------+----------+------------------+
+|       1 | abc123    | def321   | a123@gmail.com   |
+|       2 | xyz789    | vbn123   | xyz789@gmail.com |
+|       3 | wxy789    | erb123   | wxy789@gmail.com |
+|       4 | mno789    | jkl123   | mno789@gmail.com |
+|       5 | 1234      | e321     | w123@yahoo.com   |
+|       6 | kjh123    | bdf123   | ayesha@gmail.com |
+|       7 | asd739    | mhg123   | aziz@gmail.com   |
+|       8 | p889      | pl123    | e345@Hotmail.com |
+|       9 | v985      | s321     | a123@Hotmail.com |
+|      10 | mht456    | mnd123   | xyz789@yahoo.com |
+|      11 | dfr678    | fgh123   | wxy789@gmail.com |
+|      12 | q456      | v123     | m89@Hotmail.com  |
+|      13 | q456      | vg123    | no789@gmail.com  |
++---------+-----------+----------+------------------+
+13 rows in set (0.000 sec)
+
+
+///// Data have been sucessfully updated in summary table too.
+
+
+
+MariaDB [person]> select* from summary $$
++----+-------------+-------+---------+-------+
+| id | total_users | Yahoo | Hotmail | Gmail |
++----+-------------+-------+---------+-------+
+|  1 |          13 |     2 |       3 |     8 |
++----+-------------+-------+---------+-------+
+1 row in set (0.000 sec)
+
+
+/////NOw checking Delete trigger by deleting a entry.
+
+
+
+
+
+MariaDB [person]> Delete from users where email = 'a123@gmail.com' $$
+Query OK, 1 row affected (0.003 sec)
+
+
+
+
+/////the users table have been updated after deletion 
+
+
+MariaDB [person]> select* from users $$
++---------+-----------+----------+------------------+
+| user_id | user_name | password | email            |
++---------+-----------+----------+------------------+
+|       2 | xyz789    | vbn123   | xyz789@gmail.com |
+|       3 | wxy789    | erb123   | wxy789@gmail.com |
+|       4 | mno789    | jkl123   | mno789@gmail.com |
+|       5 | 1234      | e321     | w123@yahoo.com   |
+|       6 | kjh123    | bdf123   | ayesha@gmail.com |
+|       7 | asd739    | mhg123   | aziz@gmail.com   |
+|       8 | p889      | pl123    | e345@Hotmail.com |
+|       9 | v985      | s321     | a123@Hotmail.com |
+|      10 | mht456    | mnd123   | xyz789@yahoo.com |
+|      11 | dfr678    | fgh123   | wxy789@gmail.com |
+|      12 | q456      | v123     | m89@Hotmail.com  |
+|      13 | q456      | vg123    | no789@gmail.com  |
++---------+-----------+----------+------------------+
+12 rows in set (0.001 sec)
+
+
+//////the summary table have been updated after deletion 
+
+
+
+MariaDB [person]> select* from summary $$
++----+-------------+-------+---------+-------+
+| id | total_users | Yahoo | Hotmail | Gmail |
++----+-------------+-------+---------+-------+
+|  1 |          12 |     2 |       3 |     7 |
++----+-------------+-------+---------+-------+
+1 row in set (0.001 sec)
+
